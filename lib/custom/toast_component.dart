@@ -1,0 +1,17 @@
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import '../l10n/app_localizations.dart';
+import '../my_theme.dart';
+
+class ToastComponent {
+  static showDialog(String msg, {duration = 0, gravity = 0}) {
+    Fluttertoast.showToast(
+      msg: msg,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.black,
+      textColor: MyTheme.white,
+    );
+  }
+}

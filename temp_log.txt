@@ -1,0 +1,250 @@
+import 'dart:async';
+
+import 'package:active_ecommerce_cms_demo_app/custom/box_decorations.dart';
+import 'package:active_ecommerce_cms_demo_app/custom/btn.dart';
+import 'package:active_ecommerce_cms_demo_app/custom/device_info.dart';
+import 'package:active_ecommerce_cms_demo_app/custom/text_styles.dart';
+import 'package:active_ecommerce_cms_demo_app/custom/toast_component.dart';
+import 'package:active_ecommerce_cms_demo_app/helpers/shared_value_helper.dart';
+import 'package:active_ecommerce_cms_demo_app/helpers/shimmer_helper.dart';
+import 'package:active_ecommerce_cms_demo_app/my_theme.dart';
+import 'package:active_ecommerce_cms_demo_app/repositories/chat_repository.dart';
+import 'package:active_ecommerce_cms_demo_app/screens/auth/login.dart';
+import 'package:active_ecommerce_cms_demo_app/screens/brand_products.dart';
+import 'package:active_ecommerce_cms_demo_app/screens/chat/chat.dart';
+import 'package:active_ecommerce_cms_demo_app/screens/checkout/cart.dart';
+import 'package:active_ecommerce_cms_demo_app/screens/common_webview_screen.dart';
+import 'package:active_ecommerce_cms_demo_app/screens/seller_details.dart';
+import 'package:active_ecommerce_cms_demo_app/screens/video_description_screen.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:expandable/expandable.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_countdown_timer/index.dart';
+import 'package:active_ecommerce_cms_demo_app/l10n/app_localizations.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:share_plus/share_plus.dart';
+
+import '../../app_config.dart';
+import '../../custom/lang_text.dart';
+import '../../helpers/main_helpers.dart';
+import '../../repositories/auction_products_repository.dart';
+
+class AuctionProductsDetails extends StatefulWidget {
+  String slug;
+
+  AuctionProductsDetails({super.key, required this.slug});
+
+  @override
+  _AuctionProductsDetailsState createState() => _AuctionProductsDetailsState();
+}
+
+class _AuctionProductsDetailsState extends State<AuctionProductsDetails>
+    with TickerProviderStateMixin {
+  bool _showCopied = false;
+  String _appbarPriceString = ". . .";
+  int _currentImage = 0;
+  final ScrollController _mainScrollController = ScrollController(
+    initialScrollOffset: 0.0,
+  );
+  final ScrollController _colorScrollController = ScrollController();
+  final ScrollController _variantScrollController = ScrollController();
+  final ScrollController _imageScrollController = ScrollController();
+  TextEditingController sellerChatTitleController = TextEditingController();
+  TextEditingController sellerChatMessageController = TextEditingController();
+  final TextEditingController _bidPriceController = TextEditingController();
+
+  CountdownTimerController? countDownTimercontroller;
+
+  final ValueNotifier<double> _scrollPositionNotifier = ValueNotifier(0.0);
+  final ValueNotifier<double> _opacityNotifier = ValueNotifier(0.0);
+
+  Animation? _colorTween;
+  late AnimationController _ColorAnimationController;
+
+  final CarouselSliderController _carouselController = CarouselSliderController();
+  late BuildContext loadingcontext;
+
+  //init values
+  final _formKey = GlobalKey<FormState>();
+
+  var _productDetailsFetched = false;
+  dynamic _auctionproductDetails;
+  final _productImageList = [];
+  final _selectedChoices = [];
+  final _variant = "";
+  final int _quantity = 1;
+
+  @override
+  void initState() {
+    _ColorAnimationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 0),
+    );
+
+    _colorTween = ColorTween(
+      begin: Colors.transparent,
+      end: Colors.white,
+    ).animate(_ColorAnimationController);
+
+    _mainScrollController.addListener(() {
+      _scrollPositionNotifier.value = _mainScrollController.position.pixels;
+      double pos = _scrollPositionNotifier.value;
+
+      if (_mainScrollController.position.userScrollDirection ==
+          ScrollDirection.forward) {
+        if (100 > pos && pos > 1) {
+          _opacityNotifier.value = pos / 100;
+        }
+      }
+
+      if (_mainScrollController.position.userScrollDirection ==
+          ScrollDirection.reverse) {
+        if (100 > pos && pos > 1) {
+          _opacityNotifier.value = pos / 100;
+          if (100 > pos) {
+            _opacityNotifier.value = 1;
+          }
+        }
+      }
+    });
+    fetchAll();
+    super.initState();
+  }
+
+  // @override
+  // void dispose() {
+  //   _mainScrollController.dispose();
+  //   _variantScrollController.dispose();
+  //   _imageScrollController.dispose();
+  //   _colorScrollController.dispose();
+  //   // countDownTimercontroller.dispose();
+  //   _bidPriceController.dispose();
+  //   super.dispose();
+  // }
+
+  onPressBidPlace() async {
+    var bidPlacedResponse = await AuctionProductsRepository().placeBidResponse(
+      _auctionproductDetails.id.toString(),
+      _bidPriceController.text,
+    );
+
+    if (bidPlacedResponse.result == true) {
+      ToastComponent.showDialog(bidPlacedResponse.message!);
+
+      fetchAll();
+    }
+  }
+
+  fetchAll() {
+    fetchAuctionProductDetails();
+  }
+
+  fetchAuctionProductDetails() async {
+    var auctionproductDetailsResponse = await AuctionProductsRepository()
+        .getAuctionProductsDetails(widget.slug);
+
+    if (auctionproductDetailsResponse.auctionProduct!.isNotEmpty) {
+      _auctionproductDetails = auctionproductDetailsResponse.auctionProduct![0];
+      sellerChatTitleController.text =
+          auctionproductDetailsResponse.auctionProduct![0].name!;
+    }
+
+    _productDetailsFetched = true;
+    _auctionproductDetails = _auctionproductDetails; // triggers rebuild via notifier below
+    setProductDetailValues();
+  }
+
+  setProductDetailValues() {
+    if (_auctionproductDetails != null) {
+      _auctionproductDetails.photos.forEach((photo) {
+        _productImageList.add(photo.path);
+      });
+      _productDetailsFetched = true;
+    }
+  }
+
+  reset() {
+    restProductDetailValues();
+    _currentImage = 0;
+    _productImageList.clear();
+    _productDetailsFetched = false;
+    sellerChatTitleController.clear();
+  }
+
+  restProductDetailValues() {
+    _appbarPriceString = " . . .";
+    _auctionproductDetails = null;
+    _productImageList.clear();
+    _currentImage = 0;
+  }
+
+  Future<void> _onPageRefresh() async {
+    reset();
+    fetchAll();
+  }
+
+  onPopped(value) async {
+    reset();
+    fetchAll();
+  }
+
+  onCopyTap(setState) {
+    setState(() {
+      _showCopied = true;
+    });
+    Timer timer = Timer(Duration(seconds: 3), () {
+      setState(() {
+        _showCopied = false;
+      });
+    });
+  }
+
+  onPressShare(context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, StateSetter setState) {
+            return AlertDialog(
+              insetPadding: EdgeInsets.symmetric(horizontal: 10),
+              contentPadding: EdgeInsets.only(
+                top: 36.0,
+                left: 36.0,
+                right: 36.0,
+                bottom: 2.0,
+              ),
+              content: SizedBox(
+                width: 400,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Btn.minWidthFixHeight(
+                          minWidth: 75,
+                          height: 26,
+                          color: Color.fromRGBO(253, 253, 253, 1),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            side: BorderSide(color: Colors.black, width: 1.0),
+                          ),
+                          child: Text(
+                            AppLocalizations.of(context)!.copy_product_link_ucf,
+                            style: TextStyle(color: MyTheme.medium_grey),
+                          ),
+                          onPressed: () {
+                            onCopyTap(setState);
+                            // todo:: copy to clip board implement this old code not working
+
+                            Clipboard.setData(
+                              ClipboardData(text: _auctionproductDetails.link),
+                            ).then((_) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Copied to clipboard"),

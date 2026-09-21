@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Stylized Shell Shape (Professional silhouette) -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,2C7.58,2 4,5.58 4,10c0,2.15 0.83,4.11 2.2,5.58L12,22l5.8,-6.42C19.17,14.11 20,12.15 20,10c0-4.42-3.58-8-8-8zm0,11c-1.66,0-3-1.34-3-3s1.34-3 3-3 3,1.34 3,3-1.34,3-3,3z"/>
+</vector>
