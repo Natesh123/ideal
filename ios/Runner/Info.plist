@@ -100,6 +100,9 @@
 	<key>NSCameraUsageDescription</key>
 	<string>User can upload and change her profile picture from Camera</string>
 
+	<key>NSMicrophoneUsageDescription</key>
+	<string>User can send voice messages and record videos</string>
+
 	<key>NSContactsUsageDescription</key>
 	<string>Allow Contact Access For Details</string>
 
