@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "1013435605834",
+    "project_id": "ideal-traders-29dae",
+    "storage_bucket": "ideal-traders-29dae.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1013435605834:android:ef991ca9efac3917ec57b3",
+        "android_client_info": {
+          "package_name": "co.idealtraders.userapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1013435605834-s6c9jgd0v8qfmjequfhb8sgh85rv862h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDc575eNKAEAE0S87bEXhuWSE8OsGh77Ms"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1013435605834-s6c9jgd0v8qfmjequfhb8sgh85rv862h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1013435605834:android:9809d584c91b8b02ec57b3",
+        "android_client_info": {
+          "package_name": "co.idealtraders.userapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1013435605834-s6c9jgd0v8qfmjequfhb8sgh85rv862h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDc575eNKAEAE0S87bEXhuWSE8OsGh77Ms"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1013435605834-s6c9jgd0v8qfmjequfhb8sgh85rv862h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

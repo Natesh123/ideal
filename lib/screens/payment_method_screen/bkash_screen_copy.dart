@@ -1,0 +1,295 @@
+import 'dart:convert';
+
+import 'package:active_ecommerce_cms_demo_app/custom/toast_component.dart';
+import 'package:active_ecommerce_cms_demo_app/helpers/main_helpers.dart';
+import 'package:active_ecommerce_cms_demo_app/my_theme.dart';
+import 'package:active_ecommerce_cms_demo_app/repositories/payment_repository.dart';
+import 'package:active_ecommerce_cms_demo_app/screens/orders/order_list.dart';
+import 'package:active_ecommerce_cms_demo_app/screens/wallet.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:active_ecommerce_cms_demo_app/l10n/app_localizations.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
+import '../profile.dart';
+
+class BkashScreen extends StatefulWidget {
+  double? amount;
+  String payment_type;
+  String? payment_method_key;
+  var package_id;
+  int? orderId;
+  BkashScreen({
+    super.key,
+    this.amount = 0.00,
+    this.orderId = 0,
+    this.payment_type = "",
+    this.payment_method_key = "",
+    this.package_id = "0",
+  });
+
+  @override
+  _BkashScreenState createState() => _BkashScreenState();
+}
+
+class _BkashScreenState extends State<BkashScreen> {
+  final ValueNotifier<int?> _combined_order_id = ValueNotifier(0);
+  final ValueNotifier<bool> _order_init = ValueNotifier(false);
+  final ValueNotifier<String?> _initial_url = ValueNotifier("");
+  final ValueNotifier<bool> _initial_url_fetched = ValueNotifier(false);
+
+  String? _token = "";
+  final ValueNotifier<bool> showLoading = ValueNotifier(false);
+
+  final WebViewController _webViewController = WebViewController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (widget.payment_type == "cart_payment") {
+      createOrder();
+    }
+
+    if (widget.payment_type != "cart_payment") {
+      // on cart payment need proper order id
+      getSetInitialUrl();
+    }
+  }
+
+  @override
+  void dispose() {
+    _combined_order_id.dispose();
+    _order_init.dispose();
+    _initial_url.dispose();
+    _initial_url_fetched.dispose();
+    showLoading.dispose();
+    super.dispose();
+  }
+
+  createOrder() async {
+    var orderCreateResponse = await PaymentRepository().getOrderCreateResponse(
+      widget.payment_method_key,
+    );
+
+    if (orderCreateResponse.result == false) {
+      ToastComponent.showDialog(orderCreateResponse.message);
+      Navigator.of(context).pop();
+      return;
+    }
+
+    _combined_order_id.value = orderCreateResponse.combined_order_id;
+    _order_init.value = true;
+
+    getSetInitialUrl();
+  }
+
+  getSetInitialUrl() async {
+    var bkashUrlResponse = await PaymentRepository().getBkashBeginResponse(
+      widget.payment_type,
+      _combined_order_id.value,
+      widget.package_id,
+      widget.amount,
+      widget.orderId!,
+    );
+
+    if (bkashUrlResponse.result == false) {
+      ToastComponent.showDialog(bkashUrlResponse.message!);
+      Navigator.of(context).pop();
+      return;
+    }
+    _token = bkashUrlResponse.token;
+
+    _initial_url.value = bkashUrlResponse.url;
+    _initial_url_fetched.value = true;
+
+    bkash();
+
+    // print(_initial_url);
+    // print(_initial_url_fetched);
+  }
+
+  bkash() {
+    _webViewController
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onWebResourceError: (error) {},
+          onPageFinished: (page) {
+            if (page.contains("/bkash/api/callback")) {
+              getData();
+            } else if (page.contains("/bkash/api/fail")) {
+              ToastComponent.showDialog("Payment cancelled");
+              Navigator.of(context).pop();
+              return;
+            }
+          },
+        ),
+      )
+      ..loadRequest(Uri.parse(_initial_url.value!), headers: commonHeader);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: buildAppBar(context),
+      body: buildBody(),
+    );
+  }
+
+  void getData() {
+    String? paymentDetails = '';
+    _webViewController
+        .runJavaScriptReturningResult("document.body.innerText")
+        .then((data) {
+          var responseJSON = jsonDecode(data as String);
+          if (responseJSON.runtimeType == String) {
+            responseJSON = jsonDecode(responseJSON);
+          }
+          print(data);
+          if (responseJSON["result"] == false) {
+            ToastComponent.showDialog(responseJSON["message"]);
+            Navigator.pop(context);
+          } else if (responseJSON["result"] == true) {
+            paymentDetails = responseJSON['payment_details'];
+            onPaymentSuccess(responseJSON);
+          }
+        });
+  }
+
+  onPaymentSuccess(paymentDetails) async {
+    showLoading.value = true;
+
+    var bkashPaymentProcessResponse = await PaymentRepository()
+        .getBkashPaymentProcessResponse(
+          amount: widget.amount,
+          token: _token,
+          payment_type: widget.payment_type,
+          combined_order_id: _combined_order_id.value,
+          package_id: widget.package_id,
+          payment_id: paymentDetails['paymentID'],
+        );
+
+    if (bkashPaymentProcessResponse.result == false) {
+      ToastComponent.showDialog(bkashPaymentProcessResponse.message!);
+      Navigator.pop(context);
+      return;
+    }
+
+    ToastComponent.showDialog(bkashPaymentProcessResponse.message!);
+    if (widget.payment_type == "cart_payment") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return OrderList(from_checkout: true);
+          },
+        ),
+      );
+    } else if (widget.payment_type == "order_re_payment") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return OrderList(from_checkout: true);
+          },
+        ),
+      );
+    } else if (widget.payment_type == "wallet_payment") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return Wallet(from_recharge: true);
+          },
+        ),
+      );
+    } else if (widget.payment_type == "customer_package_payment") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return Profile();
+          },
+        ),
+      );
+    }
+  }
+
+  buildBody() {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _order_init,
+      builder: (context, orderInit, _) {
+        return ValueListenableBuilder<int?>(
+          valueListenable: _combined_order_id,
+          builder: (context, combinedOrderId, _) {
+            return ValueListenableBuilder<bool>(
+              valueListenable: _initial_url_fetched,
+              builder: (context, initialUrlFetched, _) {
+                return ValueListenableBuilder<bool>(
+                  valueListenable: showLoading,
+                  builder: (context, loading, _) {
+                    if (orderInit == false &&
+                        combinedOrderId == 0 &&
+                        widget.payment_type == "cart_payment") {
+                      return Container(
+                        child: Center(
+                          child: Text(AppLocalizations.of(context)!.creating_order),
+                        ),
+                      );
+                    } else if (initialUrlFetched == false) {
+                      return Container(
+                        child: Center(
+                          child: Text(AppLocalizations.of(context)!.fetching_bkash_url),
+                        ),
+                      );
+                    } else {
+                      return SingleChildScrollView(
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height,
+                          child:
+                              loading
+                                  ? Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(width: 1, height: 1),
+                                      CircularProgressIndicator(strokeWidth: 3),
+                                    ],
+                                  )
+                                  : WebViewWidget(controller: _webViewController),
+                        ),
+                      );
+                    }
+                  },
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  AppBar buildAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.white,
+      centerTitle: true,
+      leading: Builder(
+        builder:
+            (context) => IconButton(
+              icon: Icon(CupertinoIcons.arrow_left, color: MyTheme.dark_grey),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+      ),
+      title: Text(
+        AppLocalizations.of(context)!.pay_with_bkash,
+        style: TextStyle(fontSize: 16, color: MyTheme.accent_color),
+      ),
+      elevation: 0.0,
+      titleSpacing: 0,
+    );
+  }
+}
