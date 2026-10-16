@@ -5,7 +5,6 @@ import 'package:active_ecommerce_cms_demo_app/middlewares/auth_middleware.dart';
 import 'package:active_ecommerce_cms_demo_app/screens/auth/login.dart';
 import 'package:active_ecommerce_cms_demo_app/screens/filter.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -64,8 +63,6 @@ void main() async {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
-await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
     await StoreBox.init();
     await FlutterDownloader.initialize(
       debug: true,
@@ -88,9 +85,6 @@ FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
 
     runApp(ProviderScope(child: SharedValue.wrapApp(const MyApp())));
   }, (error, stack) {
-    // Record fatal errors to Crashlytics for better crash reporting
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    // Optional: keep console logs for local debugging
     print("----------- FATAL FLUTTER ERROR -----------");
     print(error);
     print(stack);
