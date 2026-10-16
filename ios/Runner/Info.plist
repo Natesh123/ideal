@@ -8,6 +8,9 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 
+	<key>CFBundleDisplayName</key>
+	<string>Ideal Traders</string>
+
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 
@@ -18,7 +21,7 @@
 	<string>6.0</string>
 
 	<key>CFBundleName</key>
-	<string>Active Ecommerce App</string>
+	<string>Ideal Traders</string>
 
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
@@ -37,7 +40,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.googleusercontent.apps.620463100599-ddb91en0ain1g4lim7ub25ced6lm6flr</string>
-				<string>fb</string>
+				<string>fb2046123582873767</string>
 			</array>
 		</dict>
 	</array>
@@ -52,13 +55,13 @@
 	<integer>5</integer>
 
 	<key>FacebookAppID</key>
-    <string></string>
+    <string>2046123582873767</string>
 
     <key>FacebookClientToken</key>
-    <string></string>
+    <string>492382936fd7b7ff5078571669082751</string>
 
     <key>FacebookDisplayName</key>
-    <string>Active Ecommerce</string>
+    <string>Ideal Traders</string>
 
 	<key>LSApplicationCategoryType</key>
 	<string></string>
@@ -71,10 +74,6 @@
 		<string>fbshareextension</string>
 		<string>sms</string>
 		<string>tel</string>
-	</array>
-
-	<key>LSApplicationQueriesSchemes</key>
-    	<array>
     	<string>instagram-stories</string>
     	<string>facebook-stories</string>
     	<string>facebook</string>
@@ -82,7 +81,7 @@
     	<string>twitter</string>
     	<string>whatsapp</string>
         <string>tg</string>
-    	</array>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 
@@ -102,7 +101,10 @@
 	<string>User can choose date from calender</string>
 
 	<key>NSCameraUsageDescription</key>
-	<string>User can upload and change her profile picture from Camera</string>
+	<string>User can upload and change profile picture from Camera</string>
+
+	<key>NSMicrophoneUsageDescription</key>
+	<string>User can send voice messages and record videos</string>
 
 	<key>NSContactsUsageDescription</key>
 	<string>Allow Contact Access For Details</string>
@@ -110,20 +112,29 @@
 	<key>NSDocumentDirectory</key>
 	<integer>1</integer>
 
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>User can set address using phone location</string>
+
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>User can set address using phone location</string>
 
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>location when in use</string>
+	<string>User can set address using phone location</string>
 
 	<key>NSMotionUsageDescription</key>
 	<string>This app will use your motion data for your active tasks</string>
 
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>User can upload and change her profile picture from PhotoLibrary</string>
+	<string>User can upload and change profile picture from PhotoLibrary</string>
 
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>User can send message or search data by voice</string>
+
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 
 	<key>UIBackgroundModes</key>
 	<array>

@@ -701,6 +701,18 @@ class _LoginState extends State<Login> {
                                   Image.asset("assets/facebook_logo.png"),
                                 ),
                               ),
+                            if (Platform.isIOS) SizedBox(width: 15),
+                            if (Platform.isIOS)
+                              InkWell(
+                                onTap: () {
+                                  signInWithApple();
+                                },
+                                child: SizedBox(
+                                  width: 28,
+                                  child:
+                                  Image.asset("assets/apple_logo.png"),
+                                ),
+                              ),
                           ],
                         ),
                       ),

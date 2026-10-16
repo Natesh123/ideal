@@ -5,7 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:get_thumbnail_video/video_thumbnail.dart';
+import 'package:get_thumbnail_video/index.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 class ProductMedia {
   final String type;
@@ -46,10 +47,13 @@ class _VideoThumbnailGeneratorState extends State<VideoThumbnailGenerator> {
         quality: 75,
       );
       if (mounted) {
-        _thumbnailPathNotifier.value = thumbnailPath;
+        _thumbnailPathNotifier.value = thumbnailPath.path;
       }
     } catch(e) {
       print("Error generating thumbnail: $e");
+      if (mounted) {
+        _thumbnailPathNotifier.value = ""; // Empty string indicates error
+      }
     }
   }
 
@@ -60,6 +64,9 @@ class _VideoThumbnailGeneratorState extends State<VideoThumbnailGenerator> {
       builder: (context, thumbnailPath, child) {
         if (thumbnailPath == null) {
           return const Center(child: CircularProgressIndicator());
+        }
+        if (thumbnailPath.isEmpty) {
+          return const Center(child: Icon(Icons.videocam_off, color: Colors.grey, size: 50));
         }
         return Image.file(
           File(thumbnailPath),

@@ -62,12 +62,28 @@ import 'single_banner/photo_provider.dart';
 void main() async {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
-    await StoreBox.init();
-    await FlutterDownloader.initialize(
-      debug: true,
-      ignoreSsl: true,
-    );
+    if (!kIsWeb) {
+      try {
+        await Firebase.initializeApp();
+      } catch (e) {
+        print("Firebase init error: $e");
+      }
+    }
+    try {
+      await StoreBox.init();
+    } catch (e) {
+      print("StoreBox init error: $e");
+    }
+    if (!kIsWeb) {
+      try {
+        await FlutterDownloader.initialize(
+          debug: true,
+          ignoreSsl: true,
+        );
+      } catch (e) {
+        print("FlutterDownloader init error: $e");
+      }
+    }
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -286,8 +302,12 @@ class _MyAppState extends State<MyApp> {
 
     super.initState();
     Future.microtask(() async {
-      if (OtherConfig.USE_PUSH_NOTIFICATION) {
-        PushNotificationService().initialise();
+      try {
+        if (OtherConfig.USE_PUSH_NOTIFICATION) {
+          await PushNotificationService().initialise();
+        }
+      } catch (e) {
+        print("PushNotificationService initialise error: $e");
       }
     });
   }
