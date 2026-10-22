@@ -172,6 +172,9 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This app uses device identifiers to provide a personalized shopping experience and improve app performance.</string>
+
 
 </dict>
 </plist>

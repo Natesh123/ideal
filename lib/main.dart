@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:active_ecommerce_cms_demo_app/l10n/app_localizations.dart';
 import 'package:active_ecommerce_cms_demo_app/middlewares/auth_middleware.dart';
@@ -31,6 +32,7 @@ import 'presenter/select_address_provider.dart';
 import 'presenter/unRead_notification_counter.dart';
 import 'providers/blog_provider.dart';
 import 'providers/locale_provider.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'screens/auction/auction_bidded_products.dart';
 import 'screens/auction/auction_products.dart';
 import 'screens/auction/auction_products_details.dart';
@@ -98,6 +100,17 @@ void main() async {
         systemNavigationBarIconBrightness: Brightness.dark,
       ),
     );
+
+    // Request App Tracking Transparency permission on iOS
+    if (Platform.isIOS) {
+      await Future.delayed(const Duration(milliseconds: 500));
+      try {
+        final status = await AppTrackingTransparency.requestTrackingAuthorization();
+        print('ATT status: $status');
+      } catch (e) {
+        print('ATT request error: $e');
+      }
+    }
 
     runApp(ProviderScope(child: SharedValue.wrapApp(const MyApp())));
   }, (error, stack) {
