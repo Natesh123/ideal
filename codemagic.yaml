@@ -1,0 +1,29 @@
+workflows:
+  ios-app-store:
+    name: iOS App Store Build
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: CM4XBDX4WK
+    environment:
+      flutter: stable
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: co.idealtraders.userapp
+    scripts:
+      - name: Disable Flutter Swift Package Manager
+        script: |
+          flutter config --no-enable-swift-package-manager
+          echo "SPM disabled successfully"
+      - name: Get Flutter packages
+        script: flutter pub get
+      - name: Build iOS IPA
+        script: |
+          flutter build ipa --release \
+            --export-options-plist=$CM_EXPORT_OPTIONS_PLIST
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        api_key: CM4XBDX4WK
+        submit_to_testflight: false
+        submit_to_app_store: false
