@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:active_ecommerce_cms_demo_app/l10n/app_localizations.dart';
 import 'package:active_ecommerce_cms_demo_app/middlewares/auth_middleware.dart';
 import 'package:active_ecommerce_cms_demo_app/screens/auth/login.dart';
