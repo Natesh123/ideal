@@ -1,3 +1,7 @@
+# Disable Flutter Swift Package Manager integration
+# Required because flutter_downloader and GoogleMaps are CocoaPods-only
+ENV['FLUTTER_DISABLE_SWIFT_PACKAGE_MANAGER'] = 'true'
+
 platform :ios, '13.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
