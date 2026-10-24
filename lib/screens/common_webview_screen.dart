@@ -30,7 +30,27 @@ class _CommonWebviewScreenState extends State<CommonWebviewScreen> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onWebResourceError: (error) {},
-          onPageFinished: (page) {},
+          onNavigationRequest: (NavigationRequest request) {
+            final urlLower = request.url.toLowerCase();
+            // Block any navigation to Google Play or third-party app stores (Apple Guideline 2.3.10)
+            if (urlLower.contains('play.google.com') ||
+                urlLower.contains('market://') ||
+                urlLower.contains('playstore')) {
+              return NavigationDecision.prevent;
+            }
+            return NavigationDecision.navigate;
+          },
+          onPageFinished: (page) {
+            // Strip any website popups or Play Store links that might be injected by the backend website
+            _webViewController.runJavaScript('''
+              (function() {
+                var popups = document.querySelectorAll('.website-popup, [data-key*="website-popup"]');
+                popups.forEach(function(el) { el.remove(); });
+                var playLinks = document.querySelectorAll('a[href*="play.google.com"], a[href*="market://"]');
+                playLinks.forEach(function(el) { el.remove(); });
+              })();
+            ''');
+          },
         ),
       )
       ..loadRequest(Uri.parse(widget.url));

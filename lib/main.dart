@@ -1,7 +1,4 @@
 import 'dart:async';
-import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 
 import 'package:active_ecommerce_cms_demo_app/l10n/app_localizations.dart';
 import 'package:active_ecommerce_cms_demo_app/middlewares/auth_middleware.dart';
@@ -102,17 +99,6 @@ void main() async {
         systemNavigationBarIconBrightness: Brightness.dark,
       ),
     );
-
-    // Request App Tracking Transparency permission on iOS
-    if (!kIsWeb && Platform.isIOS) {
-      await Future.delayed(const Duration(milliseconds: 500));
-      try {
-        final status = await AppTrackingTransparency.requestTrackingAuthorization();
-        print('ATT status: $status');
-      } catch (e) {
-        print('ATT request error: $e');
-      }
-    }
 
     runApp(ProviderScope(child: SharedValue.wrapApp(const MyApp())));
   }, (error, stack) {

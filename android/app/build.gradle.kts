@@ -76,7 +76,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
 
-    // Updated Google Play services auth
+    // Updated Google services auth
     implementation("com.google.android.gms:play-services-auth:20.7.0")
 
     // Enable core library desugaring

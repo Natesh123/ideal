@@ -1,3 +1,7 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+
 import 'package:active_ecommerce_cms_demo_app/app_config.dart';
 import 'package:active_ecommerce_cms_demo_app/helpers/addons_helper.dart';
 import 'package:active_ecommerce_cms_demo_app/helpers/auth_helper.dart';
@@ -45,6 +49,25 @@ class _IndexState extends State<Index> {
     return app_mobile_language.$;
   }
 
+  Future<void> _requestAppTrackingTransparency() async {
+    if (!kIsWeb && Platform.isIOS) {
+      try {
+        final TrackingStatus status =
+            await AppTrackingTransparency.trackingAuthorizationStatus;
+        print("ATT initial status: $status");
+        if (status == TrackingStatus.notDetermined) {
+          // Give Flutter a brief window to mount and ensure the view controller hierarchy is active
+          await Future.delayed(const Duration(milliseconds: 500));
+          final TrackingStatus newStatus =
+              await AppTrackingTransparency.requestTrackingAuthorization();
+          print("ATT updated status: $newStatus");
+        }
+      } catch (e) {
+        print("ATT request error: $e");
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -54,6 +77,12 @@ class _IndexState extends State<Index> {
   }
 
   Future<void> _initializeApp() async {
+    // On iOS, request App Tracking Transparency right on the initial screen
+    // before any tracking or personalized data processing occurs.
+    if (!kIsWeb && Platform.isIOS) {
+      await _requestAppTrackingTransparency();
+    }
+
     try {
       await getSharedValueHelperData().timeout(const Duration(seconds: 3));
     } catch (e) {
