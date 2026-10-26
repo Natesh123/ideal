@@ -661,7 +661,7 @@ class _LoginState extends State<Login> {
                     ),
                     if (allow_google_login.$ ||
                         allow_facebook_login.$ ||
-                        Platform.isIOS)
+                        (Platform.isIOS && allow_apple_login.$))
                       Padding(
                         padding: const EdgeInsets.only(top: 20.0),
                         child: Center(
@@ -673,50 +673,53 @@ class _LoginState extends State<Login> {
                           ),
                         ),
                       ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 15.0),
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (allow_google_login.$)
-                              InkWell(
-                                onTap: () {
-                                  onPressedGoogleLogin();
-                                },
-                                child: SizedBox(
-                                  width: 28,
-                                  child: Image.asset("assets/google_logo.png"),
+                    if (allow_google_login.$ ||
+                        allow_facebook_login.$ ||
+                        (Platform.isIOS && allow_apple_login.$))
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15.0),
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (allow_google_login.$)
+                                InkWell(
+                                  onTap: () {
+                                    onPressedGoogleLogin();
+                                  },
+                                  child: SizedBox(
+                                    width: 28,
+                                    child: Image.asset("assets/google_logo.png"),
+                                  ),
                                 ),
-                              ),
-                            if (allow_facebook_login.$) SizedBox(width: 15),
-                            if (allow_facebook_login.$)
-                              InkWell(
-                                onTap: () {
-                                  onPressedFacebookLogin();
-                                },
-                                child: SizedBox(
-                                  width: 28,
-                                  child:
-                                  Image.asset("assets/facebook_logo.png"),
+                              if (allow_facebook_login.$) SizedBox(width: 15),
+                              if (allow_facebook_login.$)
+                                InkWell(
+                                  onTap: () {
+                                    onPressedFacebookLogin();
+                                  },
+                                  child: SizedBox(
+                                    width: 28,
+                                    child:
+                                    Image.asset("assets/facebook_logo.png"),
+                                  ),
                                 ),
-                              ),
-                            if (Platform.isIOS) SizedBox(width: 15),
-                            if (Platform.isIOS)
-                              InkWell(
-                                onTap: () {
-                                  signInWithApple();
-                                },
-                                child: SizedBox(
-                                  width: 28,
-                                  child:
-                                  Image.asset("assets/apple_logo.png"),
+                              if (Platform.isIOS && allow_apple_login.$) SizedBox(width: 15),
+                              if (Platform.isIOS && allow_apple_login.$)
+                                InkWell(
+                                  onTap: () {
+                                    signInWithApple();
+                                  },
+                                  child: SizedBox(
+                                    width: 28,
+                                    child:
+                                    Image.asset("assets/apple_logo.png"),
+                                  ),
                                 ),
-                              ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
                     Padding(
                       padding: const EdgeInsets.only(top: 15.0),
                       child: SizedBox(

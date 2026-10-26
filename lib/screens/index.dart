@@ -52,12 +52,12 @@ class _IndexState extends State<Index> {
   Future<void> _requestAppTrackingTransparency() async {
     if (!kIsWeb && Platform.isIOS) {
       try {
+        // Allow FlutterViewController and UIWindow hierarchy to become completely active
+        await Future.delayed(const Duration(milliseconds: 1000));
         final TrackingStatus status =
             await AppTrackingTransparency.trackingAuthorizationStatus;
         print("ATT initial status: $status");
         if (status == TrackingStatus.notDetermined) {
-          // Give Flutter a brief window to mount and ensure the view controller hierarchy is active
-          await Future.delayed(const Duration(milliseconds: 500));
           final TrackingStatus newStatus =
               await AppTrackingTransparency.requestTrackingAuthorization();
           print("ATT updated status: $newStatus");
@@ -73,7 +73,9 @@ class _IndexState extends State<Index> {
     super.initState();
     print("Index screen initState. Wholesale user: ${is_wholesale_user.$}");
     _isShownSplashScreenNotifier.value = SystemConfig.isShownSplashScreed;
-    _initializeApp();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeApp();
+    });
   }
 
   Future<void> _initializeApp() async {
