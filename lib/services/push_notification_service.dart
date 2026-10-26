@@ -82,29 +82,14 @@ class PushNotificationService {
         },
       );
 
-      if (!Platform.isIOS) {
-        try {
-          await _fcm.requestPermission(
-            alert: true,
-            badge: true,
-            sound: true,
-          );
-        } catch (e) {
-          print("FCM requestPermission error: $e");
-        }
-      } else {
-        // On iOS, delay notification permission prompt so it doesn't conflict with ATT prompt on launch
-        Future.delayed(const Duration(seconds: 4), () async {
-          try {
-            await _fcm.requestPermission(
-              alert: true,
-              badge: true,
-              sound: true,
-            );
-          } catch (e) {
-            print("FCM requestPermission error: $e");
-          }
-        });
+      try {
+        await _fcm.requestPermission(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+      } catch (e) {
+        print("FCM requestPermission error: $e");
       }
 
       String? fcmToken;
