@@ -22,7 +22,6 @@ import 'package:crypto/crypto.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:active_ecommerce_cms_demo_app/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -266,38 +265,7 @@ class _LoginState extends State<Login> {
   }
 
   onPressedFacebookLogin() async {
-    try {
-      final facebookLogin = await FacebookAuth.instance.login(
-        loginBehavior: LoginBehavior.webOnly,
-      );
-
-      if (facebookLogin.status == LoginStatus.success) {
-        final userData = await FacebookAuth.instance.getUserData();
-        var loginResponse = await AuthRepository().getSocialLoginResponse(
-          "facebook",
-          userData['name'].toString(),
-          userData['email'].toString(),
-          userData['id'].toString(),
-          access_token: facebookLogin.accessToken!.tokenString,
-        );
-        if (loginResponse.result == false) {
-          ToastComponent.showDialog(loginResponse.message!);
-        } else {
-          ToastComponent.showDialog(loginResponse.message!);
-
-          AuthHelper().setUserData(loginResponse);
-          Navigator.pushAndRemoveUntil(context,
-              MaterialPageRoute(builder: (context) {
-                return Main();
-              }), (route) => false);
-          FacebookAuth.instance.logOut();
-        }
-      } else {
-        log("Facebook auth Failed.");
-      }
-    } on Exception catch (e) {
-      log("Facebook login error: $e");
-    }
+    ToastComponent.showDialog("Facebook login is currently unavailable.");
   }
 
   onPressedGoogleLogin() async {

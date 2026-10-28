@@ -90,11 +90,11 @@ class _ClassifiedProductAddState extends State<ClassifiedProductAdd> {
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(AppLocalizations.of(context)!.deny_ucf),
+            child: const Text("Cancel"),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text("Agree"),
+            child: const Text("Continue"),
           ),
         ],
       ),

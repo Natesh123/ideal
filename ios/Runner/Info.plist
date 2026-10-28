@@ -40,7 +40,6 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.googleusercontent.apps.620463100599-ddb91en0ain1g4lim7ub25ced6lm6flr</string>
-				<string>fb2046123582873767</string>
 			</array>
 		</dict>
 	</array>
@@ -54,29 +53,15 @@
 	<key>FDMaximumConcurrentTasks</key>
 	<integer>5</integer>
 
-	<key>FacebookAppID</key>
-    <string>2046123582873767</string>
-
-    <key>FacebookClientToken</key>
-    <string>492382936fd7b7ff5078571669082751</string>
-
-    <key>FacebookDisplayName</key>
-    <string>Ideal Traders</string>
 
 	<key>LSApplicationCategoryType</key>
 	<string></string>
 
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-		<string>fbapi</string>
-		<string>fb-messenger-share-api</string>
-		<string>fbauth2</string>
-		<string>fbshareextension</string>
 		<string>sms</string>
 		<string>tel</string>
     	<string>instagram-stories</string>
-    	<string>facebook-stories</string>
-    	<string>facebook</string>
     	<string>instagram</string>
     	<string>twitter</string>
     	<string>whatsapp</string>
